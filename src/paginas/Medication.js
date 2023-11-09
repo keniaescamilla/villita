@@ -16,7 +16,7 @@ function MedicationTable() {
             interval: medicationInterval,
             duration: medicationDuration,
             taken: false,
-            nextTime: null,
+            proximaToma: null,
             nextSuggestedTime: null,
         };
         setMedications([...medications, newMedication]);
@@ -33,20 +33,20 @@ function MedicationTable() {
 
         if (updatedMedications[index].taken) {
             // Registra la hora exacta de la toma en la fila actual
-            updatedMedications[index].nextTime = new Date();
+            updatedMedications[index].proximaToma = new Date();
             // Calcula la próxima hora sugerida de toma
-            updatedMedications[index].nextSuggestedTime = calculateNextTime(
-                updatedMedications[index].nextTime,
+            updatedMedications[index].nextSuggestedTime = calculateproximaToma(
+                updatedMedications[index].proximaToma,
                 updatedMedications[index].interval
             );
         } else {
             // Si la toma se marca como no tomada, limpia tanto "Hora de Toma" como "Sugerencia de Siguiente Toma"
-            updatedMedications[index].nextTime = null;
+            updatedMedications[index].proximaToma = null;
             updatedMedications[index].nextSuggestedTime = null;
         }
 
         // Si aún hay dosis por tomar, calcula la próxima toma
-        if (updatedMedications[index].nextTime && updatedMedications[index].duration > 1) {
+        if (updatedMedications[index].proximaToma && updatedMedications[index].duration > 1) {
             updatedMedications[index].duration--;
 
             // Agrega la siguiente toma a la tabla
@@ -57,7 +57,7 @@ function MedicationTable() {
                     interval: updatedMedications[index].interval,
                     duration: updatedMedications[index].duration,
                     taken: false, // Inicializamos en falso, sin llenar la "Hora de Toma"
-                    nextTime: null, // Inicializamos en null
+                    proximaToma: null, // Inicializamos en null
                     nextSuggestedTime: null, // Inicializamos en null
                 };
                 updatedMedications.splice(index + 1, 0, nextDose);
@@ -67,16 +67,22 @@ function MedicationTable() {
         setMedications(updatedMedications);
     };
 
-    const calculateNextTime = (currentTime, interval) => {
+    const calculateproximaToma = (currentTime, interval) => {
         if (!currentTime) {
             // Si es la primera toma, toma la hora actual
             return new Date();
         } else {
-            // Calcula la próxima toma sumando el intervalo de tiempo
-            const nextTime = new Date(currentTime);
-            nextTime.setHours(nextTime.getHours() + interval);
-            return nextTime;
+            const proximaToma = new Date(currentTime);
+            proximaToma.setHours(proximaToma.getHours() + interval);
+            return proximaToma;
         }
+    
+    
+    };
+
+    const formatTime = (time) => {
+        const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+        return time.toLocaleTimeString(undefined, options);
     };
 
     return (
@@ -117,6 +123,7 @@ function MedicationTable() {
                     <tr>
                         <th>Nombre del Medicamento</th>
                         <th>Dosis</th>
+                        <th>Intervalo (hrs)</th>
                         <th>Tomada</th>
                         <th>Hora de Toma</th>
                         <th>Sugerencia de Siguiente Toma</th>
@@ -127,6 +134,7 @@ function MedicationTable() {
                         <tr key={index}>
                             <td>{medication.name}</td>
                             <td>{medication.dose}</td>
+                            <td>{medication.interval}</td>
                             <td>
                                 <input
                                     type="checkbox"
@@ -138,9 +146,9 @@ function MedicationTable() {
                                 />
                             </td>
                             <td>
-                                {medication.taken ? (medication.nextTime ? medication.nextTime.toLocaleTimeString() : null) : null}
+                                {medication.taken ? (medication.proximaToma ? formatTime(medication.proximaToma) : null) : null}
                             </td>
-                            <td>{medication.nextSuggestedTime ? medication.nextSuggestedTime.toLocaleTimeString() : '-'}
+                            <td>{medication.nextSuggestedTime ? formatTime(medication.nextSuggestedTime) : '-'}
                             </td>
                         </tr>
                     ))}
