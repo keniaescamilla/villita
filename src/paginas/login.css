@@ -6,40 +6,44 @@ body{
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh; /* Ajusta la altura según tus necesidades */
+    height: 100vh;
     text-align: center;
-    background-color: #f0f0f0; /* Cambia el color de fondo según tus preferencias */
-    border: 1px solid #ccc; /* Agrega un borde según tus preferencias */
-    padding: 20px; /* Ajusta el espacio interno según tus preferencias */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Agrega una sombra según tus preferencias */
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 20px;
+    box-shadow:  2px 2px 4px #000000;; 
+  
   }
   
   h2 {
-    font-size:6em; 
-   font-weight: 500;
+    font-size:8em; 
+   font-weight: 700;
    line-height:1em;
    text-align: center;
-   color: #70d8c1;
+   color: #46b49c;
+   font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   }
   img{
-    height: 200px;
-    width: 200px;
+    height: 100px;
+    width: 100px;
   }
   .medication-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    box-shadow:  2px 2px 4px #000000;;
 }
 
 .medication-table th, .medication-table td {
     padding: 10px;
     text-align: center;
-    border: 1px solid #ccc;
+    border: none;
 }
 
 .medication-table th {
-    background-color: #0074D9;
-    color: #fff;
+    background-color: #ffffff;
+    color: #000000;
+    border: none;
 }
 
 .medication-table tbody tr:nth-child(odd) {

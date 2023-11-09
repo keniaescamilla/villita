@@ -87,7 +87,7 @@ function MedicationTable() {
 
     return (
         <div className="login-card">
-            <h2>Cuadro de Medicamentos</h2>
+            <h2>CUADRO DE MEDICAMENTOS</h2>
             <form className="medication-form">
                 <input
                     type="text"
@@ -121,6 +121,7 @@ function MedicationTable() {
             <table className="medication-table">
                 <thead>
                     <tr>
+                    <th></th>
                         <th>Nombre del Medicamento</th>
                         <th>Dosis</th>
                         <th>Intervalo (hrs)</th>
@@ -132,6 +133,7 @@ function MedicationTable() {
                 <tbody>
                     {medications.map((medication, index) => (
                         <tr key={index}>
+                            <td>{<img src="https://cdn-icons-png.flaticon.com/512/4503/4503242.png" alt="" />}</td>
                             <td>{medication.name}</td>
                             <td>{medication.dose}</td>
                             <td>{medication.interval}</td>
