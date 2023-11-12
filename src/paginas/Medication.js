@@ -9,7 +9,7 @@ function MedicationTable() {
     const [medicationInterval, setMedicationInterval] = useState('');
     const [medicationDuration, setMedicationDuration] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [currentMedicationIndex, setCurrentMedicationIndex] = useState(null);
+    const [ setCurrentMedicationIndex] = useState(null);
 
     const addMedication = () => {
         const newMedication = {

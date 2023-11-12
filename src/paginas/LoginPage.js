@@ -12,7 +12,7 @@ const LoginPage = () => {
     <div className="login-card">
         <h1>AGENDA DE MEDICAMENTOS</h1>
         <br></br>
-        <img src='https://cdn-icons-png.flaticon.com/512/1405/1405981.png'></img>
+        <img src='https://cdn-icons-png.flaticon.com/512/1405/1405981.png' alt='wow'></img>
       <h1>Iniciar sesión con Google</h1>
 
       <GoogleLogin
