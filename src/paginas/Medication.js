@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Modal from 'react-modal';
 import './login.css';
 
 function MedicationTable() {
@@ -7,6 +8,7 @@ function MedicationTable() {
     const [medicationDose, setMedicationDose] = useState('');
     const [medicationInterval, setMedicationInterval] = useState('');
     const [medicationDuration, setMedicationDuration] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentMedicationIndex, setCurrentMedicationIndex] = useState(null);
 
     const addMedication = () => {
@@ -84,40 +86,66 @@ function MedicationTable() {
         const options = { hour: 'numeric', minute: 'numeric', hour12: true };
         return time.toLocaleTimeString(undefined, options);
     };
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
 
     return (
         <div className="login-card">
             <h2>CUADRO DE MEDICAMENTOS</h2>
-            
-            <form className="medication-form">
-                <input
-                    type="text"
-                    placeholder="Nombre del Medicamento"
-                    value={medicationName}
-                    onChange={(e) => setMedicationName(e.target.value)}
-                />
-                <input
-                    type="text"
-                    placeholder="Dosis"
-                    value={medicationDose}
-                    onChange={(e) => setMedicationDose(e.target.value)}
-                />
-                <input
-                    type="number"
-                    placeholder="Intervalo (en horas)"
-                    value={medicationInterval}
-                    onChange={(e) => setMedicationInterval(e.target.value)}
-                />
-                <input
-                    type="number"
-                    placeholder="Duración (en días)"
-                    value={medicationDuration}
-                    onChange={(e) => setMedicationDuration(e.target.value)}
-                />
-                <button type="button" onClick={addMedication}>
-                    Agregar
-                </button>
-            </form>
+             {/* Botón para abrir el modal */}
+             <button onClick={openModal}>
+                Agregar Medicamento
+            </button>
+
+            {/* Modal */}
+            <Modal className = "modal"
+                isOpen={isModalOpen}
+                onRequestClose={closeModal}
+                contentLabel="Agregar Medicamento"
+            >
+                
+                <h2 className='modal-content'>Agregar Medicamento</h2>
+                <form>
+                    {/* Agrega aquí los campos del formulario */}
+                    <input
+                        type="text"
+                        placeholder="Nombre del Medicamento"
+                        value={medicationName}
+                        onChange={(e) => setMedicationName(e.target.value)}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Dosis"
+                        value={medicationDose}
+                        onChange={(e) => setMedicationDose(e.target.value)}
+                    />
+                    <input
+                        type="number"
+                        placeholder="Intervalo (en horas)"
+                        value={medicationInterval}
+                        onChange={(e) => setMedicationInterval(e.target.value)}
+                    />
+                    <input
+                        type="number"
+                        placeholder="Duración (en días)"
+                        value={medicationDuration}
+                        onChange={(e) => setMedicationDuration(e.target.value)}
+                    />
+                    <br></br>
+                    <button type="button" onClick={addMedication}>
+                        Agregar
+                    </button>
+                    <br></br>
+                    <button onClick={closeModal}>Listo!</button>
+                </form>
+               
+            </Modal>
+           
 <div className='table-card'>
             <table className="medication-table">
                 <thead>
@@ -159,6 +187,7 @@ function MedicationTable() {
                 </tbody>
             </table>
             </div>
+            
         </div>
     );
 }
