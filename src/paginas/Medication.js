@@ -68,17 +68,17 @@ function MedicationTable() {
     };
 
     const calculateproximaToma = (currentTime, interval) => {
-        if (!currentTime) {
-            // Si es la primera toma, toma la hora actual
-            return new Date();
-        } else {
-            const proximaToma = new Date(currentTime);
-            proximaToma.setHours(proximaToma.getHours() + interval);
-            return proximaToma;
-        }
-    
-    
-    };
+    if (!currentTime) {
+        // Si es la primera toma, toma la hora actual
+        return new Date();
+    } else {
+        const proximaToma = new Date(currentTime);
+        
+        proximaToma.setHours(proximaToma.getHours()+interval*13);
+        console.log(interval)
+        return proximaToma;
+    }
+};
 
     const formatTime = (time) => {
         const options = { hour: 'numeric', minute: 'numeric', hour12: true };
@@ -88,6 +88,7 @@ function MedicationTable() {
     return (
         <div className="login-card">
             <h2>CUADRO DE MEDICAMENTOS</h2>
+            
             <form className="medication-form">
                 <input
                     type="text"
@@ -117,7 +118,7 @@ function MedicationTable() {
                     Agregar
                 </button>
             </form>
-
+<div className='table-card'>
             <table className="medication-table">
                 <thead>
                     <tr>
@@ -130,10 +131,10 @@ function MedicationTable() {
                         <th>Sugerencia de Siguiente Toma</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className='tablita'>
                     {medications.map((medication, index) => (
                         <tr key={index}>
-                            <td>{<img src="https://cdn-icons-png.flaticon.com/512/4503/4503242.png" alt="" />}</td>
+                            <td className='medication-table th'>{<img src="https://cdn-icons-png.flaticon.com/512/4503/4503242.png" alt="" />}</td>
                             <td>{medication.name}</td>
                             <td>{medication.dose}</td>
                             <td>{medication.interval}</td>
@@ -154,8 +155,10 @@ function MedicationTable() {
                             </td>
                         </tr>
                     ))}
+                    
                 </tbody>
             </table>
+            </div>
         </div>
     );
 }
