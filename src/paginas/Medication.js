@@ -9,7 +9,8 @@ function MedicationTable() {
     const [medicationInterval, setMedicationInterval] = useState('');
     const [medicationDuration, setMedicationDuration] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [ setCurrentMedicationIndex] = useState(null);
+    // const momentsOfDay = ['Morning', 'Noon', 'Evening', 'Night', 'Only'];
+    const [currentMedicationIndex, setCurrentMedicationIndex] = useState(null);
 
     const addMedication = () => {
         const newMedication = {
@@ -93,7 +94,13 @@ function MedicationTable() {
     const closeModal = () => {
         setIsModalOpen(false);
     };
-
+    const momentsOfDay = [
+        { name: 'Morning',color: '#FF8C7B', image: 'https://cdn-icons-png.flaticon.com/512/10413/10413664.png' },
+        { name: 'Noon',color: '#FBEE80', image: 'https://cdn-icons-png.flaticon.com/512/10414/10414424.png' },
+        { name: 'Evening', color: '#5FA88E',image: 'https://cdn-icons-png.flaticon.com/512/6597/6597319.png' },
+        { name: 'Night',color: '#7985A2', image: 'https://cdn-icons-png.flaticon.com/512/3094/3094125.png' },
+        { name: 'only', color: '#AAD1BD',image: 'https://cdn-icons-png.flaticon.com/512/482/482004.png' },
+    ];
     return (
         <div className="login-card">
             <h2>CUADRO DE MEDICAMENTOS</h2>
@@ -147,10 +154,10 @@ function MedicationTable() {
             </Modal>
            
 <div className='table-card'>
+<h1>TUS MEDICAMENTOS</h1>
             <table className="medication-table">
                 <thead>
                     <tr>
-                    <th></th>
                         <th>Nombre del Medicamento</th>
                         <th>Dosis</th>
                         <th>Intervalo (hrs)</th>
@@ -162,7 +169,7 @@ function MedicationTable() {
                 <tbody className='tablita'>
                     {medications.map((medication, index) => (
                         <tr key={index}>
-                            <td className='medication-table th'>{<img src="https://cdn-icons-png.flaticon.com/512/4503/4503242.png" alt="" />}</td>
+                            
                             <td>{medication.name}</td>
                             <td>{medication.dose}</td>
                             <td>{medication.interval}</td>
@@ -187,7 +194,45 @@ function MedicationTable() {
                 </tbody>
             </table>
             </div>
-            
+            <div className='table-card'>
+            <h1>SUGERENCIAS DE TOMA</h1>
+            <table className="medication-table">
+                <thead>
+                    <tr>
+                        <th>MOMENTO DEL DIA</th>
+                        <th>Medicamento</th>
+                        <th>Dosis</th>
+                        <th>Intervalo (hrs)</th>
+                        <th>Tomada</th>
+                        <th>Hora de Toma</th>
+                        
+                    </tr>
+                </thead>
+                <tbody className='tablita'>
+              
+                      
+                        {momentsOfDay.map((moment, index) => (
+                            <React.Fragment key={index}>
+                               
+                            < tr key={index} className={`moment-${index}`}>
+                                <td style={{ backgroundColor: moment.color }}><img src={moment.image} alt={moment.name} /></td>
+                                {/* Puedes llenar las otras columnas según tu lógica */}
+                                <td ></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            {/* {Array.from({ length: 4 }, (_, childIndex) => (
+                                <tr key={`child-${index}-${childIndex}`} className={`child-row-${childIndex}`} colSpan="6">
+                                    Contenido de las filas secundarias
+                                </tr>
+                            ))} */}
+                        </React.Fragment>
+                        ))}
+                    </tbody>
+            </table>
+            </div>
         </div>
     );
 }
