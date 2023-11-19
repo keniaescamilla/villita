@@ -1,92 +1,225 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import './login.css';
 
 function MedicationTable() {
+    const [currentTime, setCurrentTime] = useState(new Date());
+    const [hoursToAdd, setHoursToAdd] = useState('');
+    const [resultTime, setResultTime] = useState('');
+    const [timeCategory, setTimeCategory] = useState('');
+    const [originalTime, setOriginalTime] = useState('');
+    const [inputHours, setInputHours] = useState('');//mismas??
     const [medications, setMedications] = useState([]);
-    const [medicationName, setMedicationName] = useState('');
-    const [medicationDose, setMedicationDose] = useState('');
-    const [medicationInterval, setMedicationInterval] = useState('');
-    const [medicationDuration, setMedicationDuration] = useState('');
+    const [NombreMed, setNombreMed] = useState('');
+    const [DosisMed, setDosisMed] = useState('');
+    const [medicationinputHours, setMedicationinputHours] = useState('');//mismas??
+    const [DiasMed, setDiasMed] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    // const momentsOfDay = ['Morning', 'Noon', 'Evening', 'Night', 'Only'];
     const [currentMedicationIndex, setCurrentMedicationIndex] = useState(null);
-
+    const [data, setData] = useState({
+        morning: [],
+        noon: [],
+        evening: [],
+        night: [],
+        // only: [],
+      });
+      const [TablaOnly,setTablaOnly] = useState([
+        { name: 'only', color: '#AAD1BD', image: 'https://cdn-icons-png.flaticon.com/512/482/482004.png', nextSuggestedTime: null},
+    ]);
     const addMedication = () => {
         const newMedication = {
-            name: medicationName,
-            dose: medicationDose,
-            interval: medicationInterval,
-            duration: medicationDuration,
+            name: NombreMed,
+            dose: DosisMed,
+            input: inputHours,
+            duration: DiasMed,
             taken: false,
             proximaToma: null,
             nextSuggestedTime: null,
         };
+        // Agregar la nueva dosis
         setMedications([...medications, newMedication]);
+    
         // Limpiar los campos después de agregar
-        setMedicationName('');
-        setMedicationDose('');
-        setMedicationInterval('');
-        setMedicationDuration('');
+        setNombreMed('');
+        setDosisMed('');
+        setMedicationinputHours('');
+        setDiasMed('');
     };
-
-    const toggleTaken = (index) => {
+    
+    const Check = (index) => {
         const updatedMedications = [...medications];
-        updatedMedications[index].taken = !updatedMedications[index].taken;
-
-        if (updatedMedications[index].taken) {
-            // Registra la hora exacta de la toma en la fila actual
-            updatedMedications[index].proximaToma = new Date();
-            // Calcula la próxima hora sugerida de toma
-            updatedMedications[index].nextSuggestedTime = calculateproximaToma(
-                updatedMedications[index].proximaToma,
-                updatedMedications[index].interval
-            );
-        } else {
-            // Si la toma se marca como no tomada, limpia tanto "Hora de Toma" como "Sugerencia de Siguiente Toma"
-            updatedMedications[index].proximaToma = null;
-            updatedMedications[index].nextSuggestedTime = null;
+        const medicationToMove = updatedMedications[index];
+      
+        if (!medicationToMove) {
+          // Evitar errores si el elemento no está definido
+          return;
         }
-
-        // Si aún hay dosis por tomar, calcula la próxima toma
-        if (updatedMedications[index].proximaToma && updatedMedications[index].duration > 1) {
-            updatedMedications[index].duration--;
-
-            // Agrega la siguiente toma a la tabla
-            if (updatedMedications[index].duration > 0) {
-                const nextDose = {
-                    name: updatedMedications[index].name,
-                    dose: updatedMedications[index].dose,
-                    interval: updatedMedications[index].interval,
-                    duration: updatedMedications[index].duration,
-                    taken: false, // Inicializamos en falso, sin llenar la "Hora de Toma"
-                    proximaToma: null, // Inicializamos en null
-                    nextSuggestedTime: null, // Inicializamos en null
-                };
-                updatedMedications.splice(index + 1, 0, nextDose);
-            }
+      
+        updatedMedications.splice(index, 1);
+      
+        if (medicationToMove.taken) {
+          const category = momentIndex(new Date().getHours());
+      
+          const newData = {
+            name: medicationToMove.name,
+            dose: medicationToMove.dose,
+            duration: medicationToMove.duration,
+            inputHours: hoursToAdd,
+            originalTime: originalTime,
+            resultTime: resultTime,
+          };
+      
+          setData((prevData) => ({
+            ...prevData,
+            [category]: [...prevData[category], newData],
+          }));
         }
-
+      
+        const newTime = new Date(currentTime);
+        const original = new Date(currentTime); // Guarda la hora original
+        newTime.setHours(newTime.getHours() + parseInt(hoursToAdd, 10));
+      
+        const hours = newTime.getHours();
+        const category = momentIndex(hours);
+      
+        const formattedHours = formatTime(newTime);
+      
+        setResultTime(formattedHours);
+        setTimeCategory(category);
+        setOriginalTime(formatTime(original));
+        setDiasMed(DiasMed)
+        setInputHours(hoursToAdd);
+        setNombreMed(NombreMed);
+      
+        const newData = {
+          name: medicationToMove.name,
+          DosisMed: DosisMed,
+          DiasMed: medicationToMove.dose,
+          hoursToAdd: hoursToAdd,
+          originalTime: formatTime(original),
+          resultTime: formattedHours,
+        };
+      
+        setData((prevData) => ({
+          ...prevData,
+          [category]: [...prevData[category], newData],
+        }));
+      
         setMedications(updatedMedications);
-    };
+      };
+      
+      const CheckDos = (index) => {
+        const updatedMedications = [...medications];
+      
+        if (updatedMedications[index]) {
+          updatedMedications[index].taken = !updatedMedications[index].taken;
+      
+          if (updatedMedications[index].taken) {
+            const { name, dose, input, duration } = updatedMedications[index];
+            const onlyMed = {
+              name,
+              dose,
+              input,
+              duration,
+            };
+      
+            setTablaOnly([...TablaOnly, onlyMed]);
+          }
+      
+          setMedications(updatedMedications);
+        }
+      };
+      
 
-    const calculateproximaToma = (currentTime, interval) => {
-    if (!currentTime) {
-        // Si es la primera toma, toma la hora actual
-        return new Date();
+useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+  
+const momentIndex = (hours) => {
+    if (hours >= 0 && hours < 11) {
+      return 'morning';
+    } else if (hours >= 11 && hours < 17) {
+      return 'noon';
+    } else if (hours >= 17 && hours < 19) {
+      return 'evening';
     } else {
-        const proximaToma = new Date(currentTime);
-        
-        proximaToma.setHours(proximaToma.getHours()+interval*13);
-        console.log(interval)
-        return proximaToma;
+      return 'night';
     }
-};
+  };
+const formatTime = (time) => {
+    const hours = time.getHours().toString().padStart(2, '0');
+    const minutes = time.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'pm' : 'am';
 
-    const formatTime = (time) => {
-        const options = { hour: 'numeric', minute: 'numeric', hour12: true };
-        return time.toLocaleTimeString(undefined, options);
+    return `${hours % 12 || 12}:${minutes} ${ampm}`;
+  
     };
+    const renderTable = (category) => (
+        <div key={category}>
+          <h3>{category.charAt(0).toUpperCase() + category.slice(1)} Data</h3>
+          <table className='tablita'>
+            <thead>
+              <tr>
+                <th>Medicamento</th>
+                <th>Days</th>
+                <th>Dose</th>
+                <th>Interval</th>
+                <th>hora de toma</th>
+                <th>tomada o unica toma</th>
+                <th>Siguiente</th>
+                <th>Siguiente toma</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data[category].map((item, index) => (
+                <tr key={index}>
+                  <td>{item.name}</td>
+                  <td>{item.DiasMed}</td>
+                  <td>{item.DosisMed}</td>
+                  <td>{item.hoursToAdd}</td>
+                  <td>{item.originalTime}</td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={item.taken}
+                      onChange={() => {
+                        setCurrentMedicationIndex(index);
+                        Check(index);
+                      }}
+                    />
+                    <label> Tomada</label>
+                  </td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      onChange={() => {
+                        setCurrentMedicationIndex(index);
+                        CheckDos(index);
+                      }}
+                      checked={item.taken}
+                    />
+                    <label>Toma Unica</label>
+                  </td>
+                  <td>
+                    {item.taken ? (item.proximaToma ? formatTime(item.proximaToma) : null) : null}
+                  </td>
+                  <td>
+                    <p>Siguiente toma: {resultTime}</p>
+                    <p>Momento del dia: {timeCategory}</p>
+                  </td>
+                  <td>{item.nextSuggestedTime ? formatTime(item.nextSuggestedTime) : '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+      
+    
     const openModal = () => {
         setIsModalOpen(true);
     };
@@ -94,18 +227,14 @@ function MedicationTable() {
     const closeModal = () => {
         setIsModalOpen(false);
     };
-    const momentsOfDay = [
-        { name: 'Morning',color: '#FF8C7B', image: 'https://cdn-icons-png.flaticon.com/512/10413/10413664.png' },
-        { name: 'Noon',color: '#FBEE80', image: 'https://cdn-icons-png.flaticon.com/512/10414/10414424.png' },
-        { name: 'Evening', color: '#5FA88E',image: 'https://cdn-icons-png.flaticon.com/512/6597/6597319.png' },
-        { name: 'Night',color: '#7985A2', image: 'https://cdn-icons-png.flaticon.com/512/3094/3094125.png' },
-        { name: 'only', color: '#AAD1BD',image: 'https://cdn-icons-png.flaticon.com/512/482/482004.png' },
-    ];
+   
+    
     return (
-        <div className="login-card">
+        <div>
             <h2>CUADRO DE MEDICAMENTOS</h2>
+        <h2>Current Time: {currentTime.toLocaleTimeString()}</h2>
              {/* Botón para abrir el modal */}
-             <button onClick={openModal}>
+             <button className = "button"onClick={openModal}>
                 Agregar Medicamento
             </button>
 
@@ -119,122 +248,165 @@ function MedicationTable() {
                 <h2 className='modal-content'>Agregar Medicamento</h2>
                 <form>
                     {/* Agrega aquí los campos del formulario */}
+<p>Nombre de la medicacion</p>
                     <input
                         type="text"
-                        placeholder="Nombre del Medicamento"
-                        value={medicationName}
-                        onChange={(e) => setMedicationName(e.target.value)}
+                        placeholder="Formula"
+                        value={NombreMed}
+                        onChange={(e) => setNombreMed(e.target.value)}
                     />
+                    <p>Dosis Requeridas</p>
                     <input
                         type="text"
                         placeholder="Dosis"
-                        value={medicationDose}
-                        onChange={(e) => setMedicationDose(e.target.value)}
+                        value={DosisMed}
+                        onChange={(e) => setDosisMed(e.target.value)}
                     />
+                    <p>Intervalo de hrs entre Dosis</p>
                     <input
-                        type="number"
-                        placeholder="Intervalo (en horas)"
-                        value={medicationInterval}
-                        onChange={(e) => setMedicationInterval(e.target.value)}
-                    />
+            type="number"
+            value={hoursToAdd}
+            onChange={(e) => setHoursToAdd(e.target.value)}
+          />
+          <p>Dias de Tratamiento</p>
                     <input
                         type="number"
                         placeholder="Duración (en días)"
-                        value={medicationDuration}
-                        onChange={(e) => setMedicationDuration(e.target.value)}
+                        value={DiasMed}
+                        onChange={(e) => setDiasMed(e.target.value)}
                     />
                     <br></br>
                     <button type="button" onClick={addMedication}>
                         Agregar
                     </button>
+                    
                     <br></br>
                     <button onClick={closeModal}>Listo!</button>
                 </form>
                
             </Modal>
            
-<div className='table-card'>
-<h1>TUS MEDICAMENTOS</h1>
-            <table className="medication-table">
+<div className='tablita'>
+            <table className="table-card">
+
+
+            <h4>TUS MEDICAMENTOS PENDIENTES</h4>
+               
+                <tbody className='tablita'>
                 <thead>
                     <tr>
-                        <th>Nombre del Medicamento</th>
+                        <th>Medicamento</th>
+                        <br></br>
                         <th>Dosis</th>
-                        <th>Intervalo (hrs)</th>
-                        <th>Tomada</th>
-                        <th>Hora de Toma</th>
-                        <th>Sugerencia de Siguiente Toma</th>
+                        
+                        <th>Tomada o unica dosis </th>
+                        <br></br>
+                        <br></br>
+                       
+                        <th>  Hora de Toma</th>
                     </tr>
                 </thead>
-                <tbody className='tablita'>
                     {medications.map((medication, index) => (
                         <tr key={index}>
                             
                             <td>{medication.name}</td>
                             <td>{medication.dose}</td>
-                            <td>{medication.interval}</td>
+                            <td>{  <p>Tomar cada: {medication.input} hrs, por {medication.duration} dias </p>}</td>
                             <td>
                                 <input
                                     type="checkbox"
                                     checked={medication.taken}
                                     onChange={() => {
                                         setCurrentMedicationIndex(index);
-                                        toggleTaken(index);
+                                        Check(index);
                                     }}
                                 />
+                                <label> Tomada</label>
+                                <td>
+                                <input
+    type="checkbox"
+    onChange={() => {
+        setCurrentMedicationIndex(index);
+        CheckDos(index);
+    }}
+    checked={medication.taken}
+/>
+<label>Toma Unica</label>
+
+                                </td>
                             </td>
                             <td>
                                 {medication.taken ? (medication.proximaToma ? formatTime(medication.proximaToma) : null) : null}
                             </td>
+                            <td>
+            <p>Siguiente toma: {resultTime}</p>
+            <p>Momento del dia: {timeCategory}</p>
+           
+        </td>
                             <td>{medication.nextSuggestedTime ? formatTime(medication.nextSuggestedTime) : '-'}
                             </td>
                         </tr>
                     ))}
                     
                 </tbody>
+                
             </table>
             </div>
-            <div className='table-card'>
+            <div className='medication-table'>
             <h1>SUGERENCIAS DE TOMA</h1>
-            <table className="medication-table">
-                <thead>
-                    <tr>
-                        <th>MOMENTO DEL DIA</th>
-                        <th>Medicamento</th>
-                        <th>Dosis</th>
-                        <th>Intervalo (hrs)</th>
-                        <th>Tomada</th>
-                        <th>Hora de Toma</th>
+        {Object.keys(data).map((category) => renderTable(category))}
+        <table className="medication-table">
+        <thead>
+            <tr>
+               
+                <th>Nombre del Medicamento</th>
+                <th>Dosis</th>
+                <th>Tomado</th>
+            </tr>
+            {TablaOnly.length > 0 && (
+                <tr>
+                    <td colSpan="4" style={{ backgroundColor: TablaOnly[0].color }}>
+                        <img src={TablaOnly[0].image} alt={TablaOnly[0].name} />
+                    </td>
+                </tr>
+            )}
+        </thead>
+        <tbody className='tablita'>
+<div className='only'>
+<td colSpan="4" style={{ backgroundColor: TablaOnly[0].color }}>
+                        {/* <img src={TablaOnly[0].image} alt={TablaOnly[0].name} /> */}
+                    </td>
+
+</div>
+            {TablaOnly.map((moment, index) => (
+                index !== 0 && (
+                    <tr key={index} className={`moment-${index}`}>
+                         <div>
+                         </div>
                         
+                        <td>{moment.name}</td>
+                        {medications.some(medication => moment.name.toLowerCase() === medication.name.toLowerCase()) && (
+                            <React.Fragment>
+                                <td>
+                                    {medications.find(medication => moment.name.toLowerCase() === medication.name.toLowerCase()).dose}
+                                </td>
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        checked={moment.taken}
+                                        onChange={() => CheckDos(index)}
+                                    />
+                                </td>
+                            </React.Fragment>
+                        )}
                     </tr>
-                </thead>
-                <tbody className='tablita'>
-              
-                      
-                        {momentsOfDay.map((moment, index) => (
-                            <React.Fragment key={index}>
-                               
-                            < tr key={index} className={`moment-${index}`}>
-                                <td style={{ backgroundColor: moment.color }}><img src={moment.image} alt={moment.name} /></td>
-                                {/* Puedes llenar las otras columnas según tu lógica */}
-                                <td ></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            {/* {Array.from({ length: 4 }, (_, childIndex) => (
-                                <tr key={`child-${index}-${childIndex}`} className={`child-row-${childIndex}`} colSpan="6">
-                                    Contenido de las filas secundarias
-                                </tr>
-                            ))} */}
-                        </React.Fragment>
-                        ))}
-                    </tbody>
-            </table>
-            </div>
+                )
+            ))}
+        </tbody>
+    </table>
+      </div>
         </div>
     );
 }
-
 export default MedicationTable;
+           

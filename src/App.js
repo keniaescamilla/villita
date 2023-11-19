@@ -51,12 +51,17 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 import LoginPage from './paginas/LoginPage';
 import MedicationTable from './paginas/Medication';
+import Calculadora from './paginas/calculadora';
+import Meds from './paginas/MedicationTracker';
 
 function App() {
   return (
     <Router>
       <Route exact path="/login" component={LoginPage} />
       <Route exact path="/MedicationTable" component={MedicationTable} />
+      <Route exact path="/Calculadora" component={Calculadora} />
+      <Route exact path="/Meds" component={Meds} />
+      
     </Router>
     
   );
