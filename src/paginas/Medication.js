@@ -6,6 +6,7 @@ function MedicationTable() {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [hoursToAdd, setHoursToAdd] = useState('');
     const [resultTime, setResultTime] = useState('');
+    const [resultTimeFila, setResultTimeFila] = useState('');
     const [timeCategory, setTimeCategory] = useState('');
     const [originalTime, setOriginalTime] = useState('');
     const [inputHours, setInputHours] = useState('');//mismas??
@@ -67,6 +68,7 @@ function MedicationTable() {
             inputHours: hoursToAdd,
             originalTime: originalTime,
             resultTime: resultTime,
+            resultTimeFila: resultTime + hoursToAdd,
           };
       
           setData((prevData) => ({
@@ -98,6 +100,7 @@ function MedicationTable() {
           hoursToAdd: hoursToAdd,
           originalTime: formatTime(original),
           resultTime: formattedHours,
+          resultTimeFila: resultTime + hoursToAdd,
         };
       
         setData((prevData) => ({
@@ -128,6 +131,70 @@ function MedicationTable() {
       
           setMedications(updatedMedications);
         }
+      };
+      const CheckEnMomentos= (index) => {
+        const updatedMedications = [...medications];
+        const medicationToMove = updatedMedications[index];
+      
+        if (!medicationToMove) {
+          // Evitar errores si el elemento no está definido
+          return;
+        }
+      
+        updatedMedications.splice(index, 1);
+      
+        if (medicationToMove.taken) {
+          const category = momentIndex(new Date().getHours());
+      
+          const newData = {
+            name: medicationToMove.name,
+            dose: medicationToMove.dose,
+            duration: medicationToMove.duration,
+            inputHours: hoursToAdd,
+            originalTime: originalTime,
+            resultTime: resultTime,
+            resultTimeFila: resultTime + hoursToAdd,
+          };
+      
+          setData((prevData) => ({
+            ...prevData,
+            [category]: [...prevData[category], newData],
+          }));
+        }
+      
+        const newTime = new Date(currentTime);
+        const original = new Date(currentTime); // Guarda la hora original
+        newTime.setHours(newTime.getHours() + parseInt(hoursToAdd, 10));
+      
+        const hours = newTime.getHours();
+        const category = momentIndex(hours);
+      
+        const formattedHours = formatTime(newTime);
+      
+        setResultTime(formattedHours);
+        setTimeCategory(category);
+        setOriginalTime(formatTime(original));
+        setDiasMed(DiasMed)
+        setInputHours(hoursToAdd);
+        setNombreMed(NombreMed);
+      
+        const newData = {
+          name: medicationToMove.name,
+          DosisMed: DosisMed,
+          DiasMed: medicationToMove.dose,
+          hoursToAdd: hoursToAdd,
+          originalTime: formatTime(original),
+          resultTime: formattedHours,
+          resultTimeFila: formattedHours,
+
+        };
+      
+        setData((prevData) => ({
+          ...prevData,
+          [category]: [...prevData[category], newData],
+        }));
+      
+        setMedications(updatedMedications);
       };
       
 
@@ -181,14 +248,14 @@ const formatTime = (time) => {
                   <td>{item.DiasMed}</td>
                   <td>{item.DosisMed}</td>
                   <td>{item.hoursToAdd}</td>
-                  <td>{item.originalTime}</td>
+                  <td>{item.resultTime}</td>
                   <td>
                     <input
                       type="checkbox"
                       checked={item.taken}
                       onChange={() => {
                         setCurrentMedicationIndex(index);
-                        Check(index);
+                        CheckEnMomentos(index);
                       }}
                     />
                     <label> Tomada</label>
@@ -204,14 +271,28 @@ const formatTime = (time) => {
                     />
                     <label>Toma Unica</label>
                   </td>
-                  <td>
+                  {/* <td>
+                    ll
                     {item.taken ? (item.proximaToma ? formatTime(item.proximaToma) : null) : null}
-                  </td>
+                  </td> */}
+                  {/* <td>
+                    lkl
+                    {item.taken ? (
+                      <React.Fragment>
+                        <p>Siguiente toma: {resultTime}</p>
+                        <p>Momento del dia: {timeCategory}</p>
+                      </React.Fragment>
+                    ) : null}
+                  </td> */}
                   <td>
-                    <p>Siguiente toma: {resultTime}</p>
-                    <p>Momento del dia: {timeCategory}</p>
+                    
+                    {item.taken ? (
+                      <React.Fragment>
+                        <p>Siguiente toma: {resultTime}</p>
+                        <p>Momento del dia: {timeCategory}</p>
+                      </React.Fragment>
+                    ) : null}
                   </td>
-                  <td>{item.nextSuggestedTime ? formatTime(item.nextSuggestedTime) : '-'}</td>
                 </tr>
               ))}
             </tbody>
